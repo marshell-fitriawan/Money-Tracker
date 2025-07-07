@@ -25,23 +25,18 @@ A simple and clean mobile app built with Flutter to help users track their perso
 
 ## 📂 Folder Structure
 
-lib/
+📂lib/
 ├── main.dart
-├── models/
+├── 📂models/
 │ └── trancs.dart
-├── helpers/
+├── 📂helpers/
 │ └── db_helper.dart
-├── screens/
+├── 📂screens/
 │ ├── add_tranc.dart
 │ ├── trancs_screen.dart
 │ ├── report.dart
 │ └── expence_home_screen.dart
 
-yaml
-Salin
-Edit
-
----
 
 ## 🚀 Getting Started
 
