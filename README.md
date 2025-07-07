@@ -25,3 +25,39 @@ A simple and clean mobile app built with Flutter to help users track their perso
 
 ## 📂 Folder Structure
 
+lib/
+├── main.dart
+├── models/
+│ └── trancs.dart
+├── helpers/
+│ └── db_helper.dart
+├── screens/
+│ ├── add_tranc.dart
+│ ├── trancs_screen.dart
+│ ├── report.dart
+│ └── expence_home_screen.dart
+
+yaml
+Salin
+Edit
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Flutter SDK installed → [Flutter install docs](https://docs.flutter.dev/get-started/install)
+- A connected device or emulator
+
+### Run the app
+```bash
+flutter pub get
+flutter run
+
+📄 License
+This project is open source and available under the MIT License.
+
+🙌 Author
+Made by Marshell Fitriawan
+
