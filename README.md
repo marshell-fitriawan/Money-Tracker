@@ -1,16 +1,27 @@
-# money_manager_app
+# 💰 Money Tracker App
 
-Money Manager
+A simple and clean mobile app built with Flutter to help users track their personal income and expenses. All data is stored locally using SQLite for fast and offline access.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 📱 Features
 
-A few resources to get you started if this is your first Flutter project:
+- ➕ Add income or expense transactions
+- 📋 View transaction history in a scrollable list
+- 📅 Select custom transaction date
+- 📊 Weekly or monthly financial overview (optional)
+- 💾 Offline local storage using `sqflite`
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🛠️ Built With
+
+- **Flutter** – Cross-platform mobile development
+- **Dart** – Programming language
+- **sqflite** – Local SQLite database for persistence
+- **intl** – For date and currency formatting
+
+---
+
+## 📂 Folder Structure
+
