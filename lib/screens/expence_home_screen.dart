@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Sudah ada
+import 'package:intl/intl.dart';
 import '../screens/add_tranc.dart';
 import '../screens/report.dart';
 import '../screens/trancs_screen.dart';
 import '../screens/goals_screen.dart';
 import '../db/db_helper.dart';
 import '../models/trancs.dart';
+import '../widget/home_summary.dart';
+import '../widget/home_transaction_list.dart';
 
 class ExpenseHomeScreen extends StatefulWidget {
   const ExpenseHomeScreen({super.key});
@@ -49,7 +51,6 @@ class _ExpenseHomeScreenState extends State<ExpenseHomeScreen> {
   Widget _buildHomeContent() {
     return Column(
       children: [
-        // Summary Bulanan
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Container(
@@ -69,51 +70,15 @@ class _ExpenseHomeScreenState extends State<ExpenseHomeScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      children: [
-                        const Text('Expence',
-                            style: TextStyle(color: Colors.redAccent)),
-                        const SizedBox(height: 4),
-                        Text(
-                          totalExp.toStringAsFixed(0),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        const Text('Balance',
-                            style: TextStyle(color: Colors.white)),
-                        const SizedBox(height: 4),
-                        Text(
-                          balance >= 0
-                              ? '+${balance.toStringAsFixed(0)}'
-                              : balance.toStringAsFixed(0),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        const Text('Income',
-                            style: TextStyle(color: Colors.green)),
-                        const SizedBox(height: 4),
-                        Text(
-                          totalInc.toStringAsFixed(0),
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ],
+                HomeSummary(
+                  totalExp: totalExp,
+                  totalInc: totalInc,
+                  balance: balance,
                 ),
               ],
             ),
           ),
         ),
-        // List Transaksi khusus Home
         Expanded(
           child: HomeTransactionList(trancs: _trancs),
         ),
@@ -132,7 +97,7 @@ class _ExpenseHomeScreenState extends State<ExpenseHomeScreen> {
               foregroundColor: Colors.black,
               centerTitle: true,
               title: const Text(
-                'Money Tracker',
+                'Money Manager',
                 style: TextStyle(
                   color: Color(0xFF4B2354),
                   fontWeight: FontWeight.bold,
@@ -149,7 +114,7 @@ class _ExpenseHomeScreenState extends State<ExpenseHomeScreen> {
                   ? const ReportsScreen()
                   : const GoalsScreen())),
       bottomNavigationBar: BottomAppBar(
-        color: Color.fromARGB(255, 239, 211, 247),
+        color: const Color.fromARGB(255, 239, 211, 247),
         shape: const CircularNotchedRectangle(),
         notchMargin: 8,
         child: SizedBox(
@@ -158,7 +123,7 @@ class _ExpenseHomeScreenState extends State<ExpenseHomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                icon: const Icon(Icons.emoji_events), // Goals icon
+                icon: const Icon(Icons.emoji_events),
                 onPressed: () async {
                   await Navigator.push(
                     context,
@@ -181,7 +146,7 @@ class _ExpenseHomeScreenState extends State<ExpenseHomeScreen> {
                   _loadSummary();
                 },
               ),
-              const SizedBox(width: 40), // Space for FAB
+              const SizedBox(width: 40),
               IconButton(
                 icon: const Icon(Icons.bar_chart),
                 onPressed: () {
@@ -214,56 +179,12 @@ class _ExpenseHomeScreenState extends State<ExpenseHomeScreen> {
             ),
           );
           setState(() {
-            _selectedIndex = 0; // Kembali ke Home setelah tambah data
+            _selectedIndex = 0;
           });
           _loadSummary();
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-    );
-  }
-}
-
-// Widget khusus untuk menampilkan daftar transaksi di Home
-class HomeTransactionList extends StatelessWidget {
-  final List<Trancs> trancs;
-  const HomeTransactionList({super.key, required this.trancs});
-
-  @override
-  Widget build(BuildContext context) {
-    if (trancs.isEmpty) {
-      return const Center(child: Text('Belum ada transaksi'));
-    }
-    final formatter =
-        NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0);
-    return ListView.builder(
-      itemCount: trancs.length,
-      itemBuilder: (ctx, i) {
-        final t = trancs[i];
-        final dateStr = DateFormat('dd MMM yyyy').format(t.date);
-        return ListTile(
-          leading: Icon(
-            t.jenis ? Icons.arrow_upward : Icons.arrow_downward,
-            color: t.jenis ? Colors.green : Colors.red,
-          ),
-          title: Text(t.title),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (t.desc != null && t.desc!.isNotEmpty) Text(t.desc!),
-              Text(dateStr,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey)),
-            ],
-          ),
-          trailing: Text(
-            formatter.format(t.amount),
-            style: TextStyle(
-              color: t.jenis ? Colors.green : Colors.red,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        );
-      },
     );
   }
 }

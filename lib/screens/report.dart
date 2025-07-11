@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 import '../db/db_helper.dart';
 import '../models/trancs.dart';
+import '../models/chart_data.dart';
+import '../widget/report_summary.dart';
+import '../widget/report_donut_chart.dart';
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -66,10 +68,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
     });
   }
 
-  List<_ChartData> _getChartData() {
+  List<ChartData> _getChartData() {
     DateTime now = DateTime.now();
     if (isWeekly) {
-      // Selalu 7 hari
       DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
       List<double> dailyTotals = List.filled(7, 0);
       for (var t in _filteredTransactions) {
@@ -78,9 +79,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
         dailyTotals[idx] += t.jenis ? t.amount : -t.amount;
       }
       const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-      return List.generate(7, (i) => _ChartData(days[i], dailyTotals[i]));
+      return List.generate(7, (i) => ChartData(days[i], dailyTotals[i]));
     } else {
-      // Selalu 4 minggu
       List<double> weeklyTotals = List.filled(4, 0);
       DateTime firstDay = DateTime(now.year, now.month, 1);
       for (var t in _filteredTransactions) {
@@ -90,7 +90,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         if (weekIdx > 3) weekIdx = 3;
         weeklyTotals[weekIdx] += t.jenis ? t.amount : -t.amount;
       }
-      return List.generate(4, (i) => _ChartData('W${i + 1}', weeklyTotals[i]));
+      return List.generate(4, (i) => ChartData('W${i + 1}', weeklyTotals[i]));
     }
   }
 
@@ -194,10 +194,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 child: Column(
                   children: [
                     Text(
-                      isWeekly
-                          ? 'Minggu Ini'
-                          : DateFormat('MMMM yyyy', 'en_US')
-                              .format(DateTime.now()),
+                      isWeekly ? 'This Week' : 'This Month',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -205,84 +202,19 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Column(
-                          children: [
-                            const Text('Expense',
-                                style: TextStyle(color: Colors.redAccent)),
-                            const SizedBox(height: 4),
-                            Text(
-                              totalExp.toStringAsFixed(0),
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            const Text('Balance',
-                                style: TextStyle(color: Colors.orangeAccent)),
-                            const SizedBox(height: 4),
-                            Text(
-                              balance >= 0
-                                  ? '+${balance.toStringAsFixed(0)}'
-                                  : balance.toStringAsFixed(0),
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            const Text('Income',
-                                style: TextStyle(color: Colors.green)),
-                            const SizedBox(height: 4),
-                            Text(
-                              totalInc.toStringAsFixed(0),
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ],
+                    ReportSummary(
+                      totalExp: totalExp,
+                      totalInc: totalInc,
+                      balance: balance,
                     ),
                     const SizedBox(height: 16),
-                    SizedBox(
-                      height: 200,
-                      child: SfCartesianChart(
-                        primaryXAxis: CategoryAxis(
-                          labelStyle: const TextStyle(
-                            color: Colors.orange,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        primaryYAxis: NumericAxis(
-                          labelStyle: const TextStyle(
-                            color: Colors
-                                .white, // Ganti warna agar kontras dengan background
-                            fontWeight: FontWeight.bold,
-                          ),
-                          axisLine: const AxisLine(width: 0),
-                          majorTickLines: const MajorTickLines(size: 0),
-                        ),
-                        series: <CartesianSeries>[
-                          ColumnSeries<_ChartData, String>(
-                            dataSource: _getChartData(),
-                            xValueMapper: (_ChartData data, _) => data.label,
-                            yValueMapper: (_ChartData data, _) => data.value,
-                            pointColorMapper: (_ChartData data, _) =>
-                                data.value >= 0 ? Colors.green : Colors.red,
-                            borderRadius: BorderRadius.circular(6),
-                            width: 0.7,
-                            dataLabelSettings: const DataLabelSettings(
-                              isVisible: true,
-                              textStyle: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    // ReportChart(
+                    //   chartData: _getChartData(),
+                    // ),
+                    // Tampilkan hanya donut chart
+                    ReportDonutChart(
+                      totalExp: totalExp,
+                      totalInc: totalInc,
                     ),
                   ],
                 ),
@@ -293,10 +225,4 @@ class _ReportsScreenState extends State<ReportsScreen> {
       ),
     );
   }
-}
-
-class _ChartData {
-  final String label;
-  final double value;
-  _ChartData(this.label, this.value);
 }

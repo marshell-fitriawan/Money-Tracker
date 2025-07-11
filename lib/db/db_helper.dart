@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/trancs.dart';
 import '../models/goals.dart';
+import '../models/weekly_balance.dart';
 
 class DBHelper {
   static Database? _db;
@@ -35,6 +36,15 @@ class DBHelper {
             title TEXT,
             desc TEXT,
             target REAL
+          )
+        ''');
+        await db.execute('''
+          CREATE TABLE IF NOT EXISTS weekly_balance (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            year INTEGER,
+            month INTEGER,
+            week INTEGER,
+            balance REAL
           )
         ''');
       },
@@ -97,5 +107,25 @@ class DBHelper {
       where: 'id = ?',
       whereArgs: [goal.id],
     );
+  }
+
+  // WEEKLY BALANCE CRUD
+  Future<void> insertWeeklyBalance(WeeklyBalance wb) async {
+    final db = await database;
+    await db.insert(
+      'weekly_balance',
+      wb.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<WeeklyBalance>> getWeeklyBalances(int year, int month) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'weekly_balance',
+      where: 'year = ? AND month = ?',
+      whereArgs: [year, month],
+    );
+    return List.generate(maps.length, (i) => WeeklyBalance.fromMap(maps[i]));
   }
 }
